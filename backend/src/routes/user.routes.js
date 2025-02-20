@@ -1,9 +1,10 @@
 
 import express from "express";
-import {userValidator} from "../middlewares/user.middleware.js"
-import {registerController} from "../controllers/user.controller.js"
+import {registerValidator,loginValidator} from "../middlewares/user.middleware.js"
+import {registerController,loginController} from "../controllers/user.controller.js"
 const router = express.Router();
 
-router.post("/register", userValidator, registerController)
+router.post("/register", registerValidator, registerController)
+router.post("/login", loginValidator, loginController)
 
 export default router;

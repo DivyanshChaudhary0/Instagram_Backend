@@ -1,5 +1,8 @@
 
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import config from "../config/config.js";
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -30,6 +33,30 @@ const userSchema = new mongoose.Schema({
         default: "https://imgs.search.brave.com/uLARhH16ug7xgUl3msl3yHs0DCWkofOAnLVeWQ-poy0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/a2luZHBuZy5jb20v/cGljYy9tLzI1Mi0y/NTI0Njk1X2R1bW15/LXByb2ZpbGUtaW1h/Z2UtanBnLWhkLXBu/Zy1kb3dubG9hZC5w/bmc"
     }
 },{timestamps:true})
+
+userSchema.statics.hashPassword = async function(password){
+    if(!password){
+        throw new Error("Invalid password")
+    }
+    return await bcrypt.hash(password,10)
+}
+
+userSchema.methods.comparePassword = async function(password){
+    return await bcrypt.compare(password,this.password)
+}
+
+userSchema.methods.generateToken = async function(){
+    return jwt.sign({
+        id: this._id,
+        username: this.username,
+        email: this.email
+    },config.JWT_SECRET,{expiresIn: config.JWT_EXPIRY})
+}
+
+userSchema.statics.verifyToken = function(token){
+    return jwt.verify(token,config.JWT_SECRET)
+}
+
 
 const userModel = mongoose.model("User",userSchema)
 export default userModel
