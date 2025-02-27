@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
     photoURL: {
         type: String,
         default: "https://imgs.search.brave.com/uLARhH16ug7xgUl3msl3yHs0DCWkofOAnLVeWQ-poy0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/a2luZHBuZy5jb20v/cGljYy9tLzI1Mi0y/NTI0Njk1X2R1bW15/LXByb2ZpbGUtaW1h/Z2UtanBnLWhkLXBu/Zy1kb3dubG9hZC5w/bmc"
-    }
+    },
 },{timestamps:true})
 
 userSchema.statics.hashPassword = async function(password){
@@ -45,9 +45,9 @@ userSchema.methods.comparePassword = async function(password){
     return await bcrypt.compare(password,this.password)
 }
 
-userSchema.methods.generateToken = async function(){
+userSchema.methods.generateToken = function(){
     return jwt.sign({
-        id: this._id,
+        _id: this._id,
         username: this.username,
         email: this.email
     },config.JWT_SECRET,{expiresIn: config.JWT_EXPIRY})
@@ -58,5 +58,5 @@ userSchema.statics.verifyToken = function(token){
 }
 
 
-const userModel = mongoose.model("User",userSchema)
+const userModel = mongoose.model("user",userSchema)
 export default userModel
